@@ -45,52 +45,55 @@ st.title("Max ZFW – Pax + Cargo Checker")
 # --------------------------
 cols_top = st.columns([1,1,1,1])
 with cols_top[0]:
-    aircraft = st.selectbox("Aircraft Type", ["CJ2", "CJ3", "Embraer"],
-                            index=["CJ2","CJ3","Embraer"].index(st.session_state.aircraft),
-                            key="aircraft")
+    aircraft = st.selectbox(
+        "Aircraft Type",
+        ["CJ2", "CJ3", "Embraer"],
+        index=["CJ2", "CJ3", "Embraer"].index(st.session_state.aircraft),
+        key="aircraft"
+    )
+
 with cols_top[1]:
-    season = st.radio("Season", ["Summer", "Winter"],
-                      index=["Summer","Winter"].index(st.session_state.season),
-                      horizontal=True, key="season")
+    season = st.radio(
+        "Season",
+        ["Summer", "Winter"],
+        index=["Summer", "Winter"].index(st.session_state.season),
+        horizontal=True,
+        key="season"
+    )
+
 with cols_top[2]:
     if st.checkbox("Auto-detect season (info only)"):
         today = date.today()
-        is_summer = (today.month > 3 and today.month < 11) or \
-                    (today.month == 4 and today.day >= 1) or \
-                    (today.month == 10 and today.day <= 31)
-        st.info(f"Today: {today.isoformat()} → Suggested season: {'Summer' if is_summer else 'Winter'}")
+        # Summer Apr 1 – Oct 31; Winter Nov 1 – Mar 31
+        is_summer = (
+            (today.month > 3 and today.month < 11)
+            or (today.month == 4 and today.day >= 1)
+            or (today.month == 10 and today.day <= 31)
+        )
+        st.info(
+            f"Today: {today.isoformat()} → Suggested season: {'Summer' if is_summer else 'Winter'}"
+        )
+
 with cols_top[3]:
     st.write("")  # spacer
+    if st.button("Clear All"):
+        # Reset passenger override weights
+        for key in list(st.session_state.keys()):
+            if key.startswith("pax_w_"):
+                st.session_state[key] = 0  # keep fields visible, reset to 0
+
+        # Reset top controls
+        st.session_state.aircraft = "CJ2"
+        st.session_state.season = "Summer"
+        st.session_state.pax_override = False
+        st.session_state.cargo_override = False
+
+        # Reset input defaults
+        st.session_state.pax_count = 0
+        st.session_state.cargo_weight = 0
 
 st.markdown("---")
 
-# --------------------------
-# Pax & Cargo Inputs
-# --------------------------
-pax_count = st.number_input("Passengers", min_value=0, max_value=10, value=0, key="pax_count")
-cargo_weight = st.number_input("Cargo (lbs)", min_value=0, max_value=2000, value=0, key="cargo_weight")
-
-# --------------------------
-# Clear All button (RESET)
-# --------------------------
-if st.button("Clear All"):
-    # Reset passenger override weights
-    for key in list(st.session_state.keys()):
-        if key.startswith("pax_w_"):
-            st.session_state[key] = 0  # keep fields visible, reset to 0
-
-    # Reset top controls
-    st.session_state.aircraft = "CJ2"
-    st.session_state.season = "Summer"
-    st.session_state.pax_override = False
-    st.session_state.cargo_override = False
-
-    # Reset inputs
-    st.session_state.pax_count = 0
-    st.session_state.cargo_weight = 0
-
-
-st.markdown("---")
 
 # --------------------------
 # Pax entry (standard vs override)
@@ -197,6 +200,7 @@ else:
 
 # Footer note
 st.caption("Note: This tool checks pax + cargo against your planning maxima for each tail type and season. It does not compute full ZFW or CG.")
+
 
 
 
