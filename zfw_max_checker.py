@@ -58,11 +58,11 @@ with cols_top[2]:
 with cols_top[3]:
     st.write("")  # spacer
     if st.button("Clear All"):
-        for key in ["aircraft","season","pax_override","cargo_override"]:
-            if key in st.session_state:
-                del st.session_state[key]
+        st.session_state.aircraft = "CJ2"
+        st.session_state.season = "Summer"
+        st.session_state.pax_override = False
+        st.session_state.cargo_override = False
         st.experimental_rerun()
-
 
 st.markdown("---")
 
@@ -171,5 +171,6 @@ else:
 
 # Footer note
 st.caption("Note: This tool checks pax + cargo against your planning maxima for each tail type and season. It does not compute full ZFW or CG.")
+
 
 
