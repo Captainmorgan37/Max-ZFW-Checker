@@ -4,6 +4,19 @@ from datetime import date
 st.set_page_config(page_title="Max ZFW (Pax + Cargo) Checker", layout="centered")
 
 # --------------------------
+# Initialize defaults in session_state
+# --------------------------
+if "aircraft" not in st.session_state:
+    st.session_state.aircraft = "CJ2"
+if "season" not in st.session_state:
+    st.session_state.season = "Summer"
+if "pax_override" not in st.session_state:
+    st.session_state.pax_override = False
+if "cargo_override" not in st.session_state:
+    st.session_state.cargo_override = False
+
+
+# --------------------------
 # Config & helper functions
 # --------------------------
 MAX_PAX_CARGO = {
@@ -32,9 +45,9 @@ st.title("Max ZFW – Pax + Cargo Checker")
 # --------------------------
 cols_top = st.columns([1,1,1,1])
 with cols_top[0]:
-    aircraft = st.selectbox("Aircraft Type", ["CJ2", "CJ3", "Embraer"])
+    aircraft = st.selectbox("Aircraft Type", ["CJ2", "CJ3", "Embraer"], index=["CJ2","CJ3","Embraer"].index(st.session_state.aircraft), key="aircraft")
 with cols_top[1]:
-    season = st.radio("Season", ["Summer", "Winter"], horizontal=True, index=0)
+    season = st.radio("Season", ["Summer", "Winter"], index=["Summer","Winter"].index(st.session_state.season), horizontal=True, key="season")
 with cols_top[2]:
     # Optional helper to pick season by date (not enforced)
     if st.checkbox("Auto-detect season (info only)"):
@@ -46,7 +59,9 @@ with cols_top[3]:
     st.write("")  # spacer
     reset = st.button("Clear All")
 
-if reset:
+if st.button("Clear All"):
+    for key in ["aircraft","season","pax_override","cargo_override"]:
+        del st.session_state[key]
     st.experimental_rerun()
 
 st.markdown("---")
@@ -156,3 +171,4 @@ else:
 
 # Footer note
 st.caption("Note: This tool checks pax + cargo against your planning maxima for each tail type and season. It does not compute full ZFW or CG.")
+
