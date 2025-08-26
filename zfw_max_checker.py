@@ -43,7 +43,7 @@ st.title("Max ZFW – Pax + Cargo Checker")
 # --------------------------
 # Top controls
 # --------------------------
-cols_top = st.columns([1,1,1,1])
+cols_top = st.columns([1, 1, 1])
 with cols_top[0]:
     aircraft = st.selectbox(
         "Aircraft Type",
@@ -53,29 +53,35 @@ with cols_top[0]:
     )
 
 with cols_top[1]:
+    # Month dropdown
+    months = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ]
+    selected_month = st.selectbox(
+        "Flight Month",
+        months,
+        index=date.today().month - 1,
+        key="month"
+    )
+
+    # Auto-assign season from month
+    if selected_month in ["April", "May", "June", "July", "August", "September", "October"]:
+        auto_season = "Summer"
+    else:
+        auto_season = "Winter"
+    st.caption(f"Auto-detected season from month: **{auto_season}**")
+
+with cols_top[2]:
+    # Manual override (default still comes from auto_season)
     season = st.radio(
-        "Season",
+        "Season (manual override)",
         ["Summer", "Winter"],
-        index=["Summer", "Winter"].index(st.session_state.season),
+        index=["Summer", "Winter"].index(auto_season),
         horizontal=True,
         key="season"
     )
 
-with cols_top[2]:
-    if st.checkbox("Auto-detect season (info only)"):
-        today = date.today()
-        # Summer Apr 1 – Oct 31; Winter Nov 1 – Mar 31
-        is_summer = (
-            (today.month > 3 and today.month < 11)
-            or (today.month == 4 and today.day >= 1)
-            or (today.month == 10 and today.day <= 31)
-        )
-        st.info(
-            f"Today: {today.isoformat()} → Suggested season: {'Summer' if is_summer else 'Winter'}"
-        )
-
-
-st.markdown("---")
 
 
 # --------------------------
@@ -198,6 +204,7 @@ else:
 
 # Footer note
 st.caption("Note: This tool checks pax + cargo against your planning maxima for each tail type and season. It does not compute full ZFW or CG.")
+
 
 
 
