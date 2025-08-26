@@ -125,12 +125,25 @@ else:
 st.subheader("Cargo")
 
 default_cargo = 30 * total_pax
-cargo_override = st.checkbox("Override cargo (enter total cargo weight)")
+cargo_override = st.checkbox("Override cargo (enter total cargo weight)", key="cargo_override")
+
 if cargo_override:
-    cargo_weight = st.number_input("Cargo weight (lb)", min_value=0.0, step=1.0, value=float(default_cargo))
+    # Use session state so pax changes don’t reset the override
+    if "cargo_weight" not in st.session_state:
+        st.session_state.cargo_weight = float(default_cargo)
+
+    cargo_weight = st.number_input(
+        "Cargo weight (lb)",
+        min_value=0.0,
+        step=1.0,
+        value=st.session_state.cargo_weight,
+        key="cargo_weight"
+    )
 else:
     cargo_weight = float(default_cargo)
+    st.session_state.cargo_weight = cargo_weight  # keep in sync for when override is toggled
     st.write(f"Assumed cargo: {default_cargo} lb (30 lb × {total_pax} pax)")
+
 
 # --------------------------
 # Calculation & results
@@ -183,6 +196,7 @@ else:
 
 # Footer note
 st.caption("Note: This tool checks pax + cargo against your planning maxima for each tail type and season. It does not compute full ZFW or CG.")
+
 
 
 
